@@ -20,8 +20,9 @@ If not, it raises a ValueError. If everything checks out, it concatenates "DR" w
 sets the "DR" attribute in "sc" to be equal to the column names in "DR".
 '''
 
+import pandas as pd
+
 def setSoupProfile(sc, soupProfile):
-    import pandas as pd
     import classFunctions as cf
     if 'est' not in soupProfile.columns:
         raise ValueError("est column missing from soupProfile")
@@ -34,8 +35,6 @@ def setSoupProfile(sc, soupProfile):
     return sc
 
 def set_clusters(sc, clusters):
-    import pandas as pd
-
     if not all(sc.toc.columns.isin(clusters.index)):
         if len(clusters) != sc.metaData.shape[0]:
             raise ValueError("Invalid cluster specification. See help.")
@@ -70,8 +69,6 @@ def setContaminationFraction(sc, contFrac, forceAccept=False):
     return sc
 
 def setDR(sc, DR, reductName=None):
-    import pandas as pd
-    
     # If more than two columns, keep the first two
     if DR.shape[1] > 2:
         print(f"DR has {DR.shape[1]} columns where 2 were expected. Using first two.")

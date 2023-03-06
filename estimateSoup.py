@@ -12,6 +12,9 @@ results in a data frame with row names from sc$tod and column names of "est" for
 in each droplet. If keepDroplets is FALSE, the droplet count table (sc$tod) is removed to save space. The function returns the updated SoupChannel object.
 '''
 
+# Added to Study Project codes\classFunctions.py directly, redundant file just kept as backup
+
+''''
 def estimateSoup(sc, soupRange=[0, 100], keepDroplets=False):
     import numpy as np
     import pandas as pd
@@ -33,5 +36,6 @@ def estimateSoup(sc, soupRange=[0, 100], keepDroplets=False):
     if not keepDroplets:
         sc.tod = None
     return sc
+'''
 
 # Note that this code assumes that the SoupChannel object has the following attributes: nDropUMIs, tod, and soupProfile.
