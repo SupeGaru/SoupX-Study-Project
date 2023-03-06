@@ -1,3 +1,25 @@
+'''
+The Python code defines several functions that modify a single object "sc".
+
+The first function "setSoupProfile" takes as input "sc" (an object), and a Pandas dataframe "soupProfile". It first checks if the "soupProfile" contains the necessary columns "est" and "counts".
+If not, it raises a ValueError. It also checks that all the genes in "soupProfile" are present in the index of "sc". If any genes are missing, it raises an error. If everything checks out, it sets 
+the attribute "sc.soupProfile" to be equal to "soupProfile" indexed by "sc.toc.index".
+
+The second function "set_clusters" takes as input "sc" and a Pandas dataframe "clusters". It checks if all columns in the index of "clusters" are also columns in the index of "sc.toc". If not, it 
+checks if the length of "clusters" is equal to the number of rows in "sc.metaData". If not, it raises a ValueError. If everything checks out, it sets the "clusters" column in "sc.metaData" to be 
+equal to "clusters".
+
+The third function "setContaminationFraction" takes as input "sc", a vector "contFrac" (of length 1 or equal to the number of rows in "sc.metaData"), and a Boolean "forceAccept". It first checks 
+if any values in "contFrac" are greater than 1. If so, it raises an Exception. If "forceAccept" is True, it prints a warning but continues. If any values in "contFrac" are greater than 0.5, it 
+raises an Exception with a warning message. If any values in "contFrac" are greater than 0.3, it prints a message. If "contFrac" is of length 1, it sets the "rho" column in "sc.metaData" to be 
+equal to "contFrac". Otherwise, it sets the "rho" values in "sc.metaData" indexed by the keys in "contFrac" to be equal to the values in "contFrac".
+
+The fourth function "setDR" takes as input "sc", a Pandas dataframe "DR", and a string "reductName". It first checks if "DR" has more than two columns. If so, it prints a message and keeps only the 
+first two columns. It then checks if all the row names in "DR" are present in the index of "sc.metaData". If not, it checks if the number of rows in "DR" is equal to the number of rows in "sc.metaData". 
+If not, it raises a ValueError. If everything checks out, it concatenates "DR" with "sc.metaData" indexed by the rows in "DR". If "reductName" is not None, it renames the columns of "DR". Finally, it 
+sets the "DR" attribute in "sc" to be equal to the column names in "DR".
+'''
+
 def setSoupProfile(sc, soupProfile):
     import pandas as pd
     import classFunctions as cf
