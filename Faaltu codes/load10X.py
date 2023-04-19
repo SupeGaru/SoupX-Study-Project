@@ -78,9 +78,9 @@ def load_10X(data_dir, cellIDs=None, channel_name=None, read_args=None, include_
         DR = None
 
     # Ensure rownames of metadata match column names of counts
-    if mDat is not None and any(mDat.index != datCells.columns):
+    if mDat is not None and any(mDat.index != dat_cells.columns):
         mDat.index = mDat.index.str.replace('-1$', '')
-        if any(mDat.index != datCells.columns):
+        if any(mDat.index != dat_cells.columns):
             raise ValueError("Error matching meta-data to cell names.")
 
     # Get a name for the channel
@@ -88,7 +88,7 @@ def load_10X(data_dir, cellIDs=None, channel_name=None, read_args=None, include_
         channelName = dataDir if names(dataDir) is None else names(dataDir)
 
     return SoupChannel(tod=dat,
-                       toc=datCells,
+                       toc=dat_cells,
                        metaData=mDat,
                        channelName=channelName,
                        dataDir=dataDir,

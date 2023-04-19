@@ -1,6 +1,6 @@
 # The quickMarkers R function uses Term Frequency - Inverse Document Frequency (tf-idf) ordering to get the top N markers 
 # of each cluster. For each cluster, it returns either the top N or all genes passing the hypergeometric test with the
-#  False Discovery Rate (FDR) specified, whichever list is smallest.
+# False Discovery Rate (FDR) specified, whichever list is smallest.
 
 # The function first binarizes gene expression data in each cell, replacing the counts with 1 if the count is above a
 #  threshold (expressCut), and 0 otherwise. The frequency with which a gene is expressed within the target group is compared 
