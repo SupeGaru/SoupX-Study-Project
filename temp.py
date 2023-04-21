@@ -42,6 +42,23 @@ def create_bg_gene_empty():
 
 # found the set of genes/cells for which we can assume that there is no cell endogenous expression (wahan nahi hone chahiye tha) (equation 4 ke upar)
 
+def identify_doublets():
+    geneColumns = auxiliary()[0]
+    detected = auxiliary()[1]
+    global toc
+
+    for i in range(len(detected)):
+        h1n1 = detected['subsets_H1N1_sum'][i]
+        h3n2 = detected['subsets_H3N2_sum'][i]
+
+        if(h3n2 > h1n1 and h3n2/(h3n2+h1n1)<0.8):
+            for j in range(len(geneColumns)):
+                toc[geneColumns[j]][i] = 0.0001
+        elif(h1n1 > h3n2 and h1n1/(h3n2+h1n1)<0.8):
+            for j in range(len(geneColumns)):
+                toc[geneColumns[j]][i] = 0.0001
+    
+
 def create_rho_c():
     detected = auxiliary()[1]
     h1n1_columns = auxiliary()[2]
@@ -119,4 +136,5 @@ def write_mgc():
     mgc = pd.DataFrame(mgc)
     mgc.to_csv('output.csv', index=False, header=False)
 
+identify_doublets()
 write_mgc()
