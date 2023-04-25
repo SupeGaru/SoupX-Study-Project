@@ -8,6 +8,7 @@ tod = pd.read_csv("data.csv", index_col=0)
 tod.drop('Barcode', axis=1, inplace=True)
 empty_drops = tod.loc[tod['sum']<20]
 toc = tod.loc[tod['sum']>20]
+doublets = []
 
 def auxiliary():
     geneColumns = ['swH3N2_PB2_comm_raw', 'swH1N1_PB2_comm_raw', 'swH3N2_PB1_comm2_raw', 'swH1N1_PB1_comm2_raw',
@@ -42,21 +43,24 @@ def create_bg_gene_empty():
 
 # found the set of genes/cells for which we can assume that there is no cell endogenous expression (wahan nahi hone chahiye tha) (equation 4 ke upar)
 
-def identify_doublets():
-    geneColumns = auxiliary()[0]
-    detected = auxiliary()[1]
-    global toc
+# def identify_doublets():
+#     geneColumns = auxiliary()[0]
+#     detected = auxiliary()[1]
+#     global toc
+#     global doublets
 
-    for i in range(len(detected)):
-        h1n1 = detected['subsets_H1N1_sum'][i]
-        h3n2 = detected['subsets_H3N2_sum'][i]
+#     for i in range(len(detected)):
+#         h1n1 = detected['subsets_H1N1_sum'][i]
+#         h3n2 = detected['subsets_H3N2_sum'][i]
 
-        if(h3n2 > h1n1 and h3n2/(h3n2+h1n1)<0.8):
-            for j in range(len(geneColumns)):
-                toc[geneColumns[j]][i] = 0.0001
-        elif(h1n1 > h3n2 and h1n1/(h3n2+h1n1)<0.8):
-            for j in range(len(geneColumns)):
-                toc[geneColumns[j]][i] = 0.0001
+#         if(h3n2 > h1n1 and h3n2/(h3n2+h1n1)<0.8):
+#             for j in range(len(geneColumns)):
+#                 doublets.append(toc[geneColumns[j]][i])
+#                 toc.drop(toc.index[i])
+#         elif(h1n1 > h3n2 and h1n1/(h3n2+h1n1)<0.8):
+#             for j in range(len(geneColumns)):
+#                 doublets.append(toc[geneColumns[j]][i])
+#                 toc.drop(toc.index[i])
     
 
 def create_rho_c():
@@ -136,5 +140,6 @@ def write_mgc():
     mgc = pd.DataFrame(mgc)
     mgc.to_csv('output.csv', index=False, header=False)
 
-identify_doublets()
+# identify_doublets()
 write_mgc()
+# print(doublets)
