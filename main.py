@@ -7,9 +7,11 @@ This project has been completed by the following students of BITS Pilani, Hydera
 import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt
+import random
 
 # taking input from csv file
 tod = pd.read_csv("data.csv", index_col=0)
+tod = tod.dropna()
 
 # seperating the empty droplets from the dataset based on a cutoff value of 20
 empty_drops = tod.loc[tod['sum']<20]
@@ -28,6 +30,109 @@ xInitialSum = []
 yInitialSum = []
 errorInitial = 0
 errorFinal = 0
+
+#initialisation of individual gene values for plotting
+xPB2i = []
+yPB2i = []
+xPB1i = []
+yPB1i = []
+xPAi = []
+yPAi = []
+xHAai = []
+yHAai = []
+xNPi = []
+yNPi = []
+yNAai = []
+xNAbi = []
+xMi = []
+yMi = []
+xNSi = []
+yNSi = []
+xPB2f = []
+yPB2f = []
+xPB1f = []
+yPB1f = []
+xPAf = []
+yPAf = []
+xHAaf = []
+yHAaf = []
+xNPf = []
+yNPf = []
+yNAaf = []
+xNAbf = []
+xMf = []
+yMf = []
+xNSf = []
+yNSf = []
+
+#global variables for counting
+empty_count = 0
+h1n1_count_initial = 0
+h3n2_count_initial = 0
+partialh1n1_count_initial = 0
+partialh3n2_count_initial = 0
+doublet_count_initial = 0
+reassortment_count_initial = 0
+h1n1_count_final = 0
+h3n2_count_final = 0
+partialh1n1_count_final = 0
+partialh3n2_count_final = 0
+doublet_count_final = 0
+reassortment_count_final = 0
+
+def classification_tod():
+    name = []
+    global tod, empty_count, h1n1_count_initial, h3n2_count_initial, partialh1n1_count_initial, partialh3n2_count_initial, doublet_count_initial, reassortment_count_initial
+    for i in range(tod.shape[0]):
+        flag = False
+        n_h1 = 0
+        n_h2 = 0
+        if(tod['sum'][i]<20):
+            name.append("Empty")
+            empty_count += 1
+            # print(empty_count)
+        else:
+            for j in range (0,8):
+                # print(tod.iloc[i][8+2*j])
+                if(tod.iloc[i][8+2*j-1]>0 and tod.iloc[i][8+2*j]>0):
+                    flag = True
+                if(tod.iloc[i][8+2*j-1]>0):
+                    n_h2 += 1
+                if(tod.iloc[i][8+2*j]>0):
+                    n_h1 += 1
+            if(flag==True): 
+                name.append("Doublet")
+                doublet_count_initial += 1
+            else:
+                # print(n_h1 + " " + n_h2)
+                if(n_h1==8 and n_h2==0):
+                    name.append("H1N1")
+                    h1n1_count_initial += 1
+                elif(n_h1==0 and n_h2==8):
+                    name.append("H3N2")
+                    h3n2_count_initial += 1
+                elif(n_h1>=1 and n_h1<=7 and n_h2>=1 and n_h2<=7):
+                    name.append("Reassortment")
+                    reassortment_count_initial += 1
+                elif(n_h1==0):
+                    name.append("Partial H3N2")
+                    partialh3n2_count_initial += 1
+                elif(n_h2==0):
+                    name.append("Partial H1N1")
+                    partialh1n1_count_initial += 1
+
+    tod['Genotype'] = name
+    tod = pd.DataFrame(tod)
+    tod.to_csv("output_tod.csv")
+
+    # print(h1n1_count_initial)
+    # print(h3n2_count_initial)
+    # print(partialh1n1_count_initial)
+    # print(partialh3n2_count_initial)
+    # print(reassortment_count_initial)
+    # print(empty_count)
+    # print(doublet_count_initial)
+    # print(tod)  
 
 # auxiliary function to initialize the variables to be used in the further program
 def auxiliary():
@@ -188,6 +293,7 @@ def create_mgc(toc):
 def write_mgc():
     # variables initialised using previous functions
     old_mgc = create_mgc(toc)
+
     # new_mgc created to add the barcode column and headers row
     new_mgc = []
     headers = ['Barcode', 'swH3N2_PB2_comm_raw', 'swH1N1_PB2_comm_raw', 'swH3N2_PB1_comm2_raw', 'swH1N1_PB1_comm2_raw',
@@ -207,6 +313,41 @@ def write_mgc():
     
     # new_mgc converted to dataframe and written to csv file
     mgc = pd.DataFrame(new_mgc)
+    
+    global h1n1_count_final, h3n2_count_final, doublet_count_final, reassortment_count_final, partialh1n1_count_final, partialh3n2_count_final
+    name = ['Genotype']
+    for i in range(1, mgc.shape[0]):
+        flag = False
+        n_h1 = 0
+        n_h2 = 0
+        
+        for j in range (0,8):
+            if(int(mgc.iloc[i][2*j+1])>0 and int(mgc.iloc[i][2*j+2])>0):
+                flag = True
+            if(int(mgc.iloc[i][2*j+1])>0):
+                n_h2 += 1
+            if(int(mgc.iloc[i][2*j+2])>0):
+                n_h1 += 1
+        if(flag==True): 
+            name.append("Doublet")
+            doublet_count_final += 1
+        else:
+            if(n_h1==8 and n_h2==0):
+                name.append("H1N1")
+                h1n1_count_final += 1
+            elif(n_h1==0 and n_h2==8):
+                name.append("H3N2")
+                h3n2_count_final += 1
+            elif(n_h1>=1 and n_h1<=7 and n_h2>=1 and n_h2<=7):
+                    name.append("Reassortment")
+                    reassortment_count_final += 1
+            elif(n_h1==0):
+                name.append("Partial H3N2")
+                partialh3n2_count_final += 1
+            elif(n_h2==0):
+                name.append("Partial H1N1")
+                partialh1n1_count_final += 1
+    mgc[17] = name
     mgc.to_csv('output.csv', index=False, header=False)
 
     return old_mgc
@@ -236,13 +377,13 @@ def SumPlotGraph():
 
     # plotting the subplots in one graph
     plt.subplot(1,2,1)
-    plt.plot(xInitialSum, yInitialSum, 'o', color = 'blue')
+    plt.plot(xInitialSum, yInitialSum, '.', color = 'blue')
     plt.title('Initial nUMIs')
     plt.xlabel('H1N1')
     plt.ylabel('H3N2')
 
     plt.subplot(1,2,2)
-    plt.plot(xFinalSum, yFinalSum, 'o', color = 'red')
+    plt.plot(xFinalSum, yFinalSum, '.', color = 'red')
     plt.title('Final nUMIs')
     plt.xlabel('H1N1')
     plt.ylabel('H3N2')
@@ -251,7 +392,7 @@ def SumPlotGraph():
     plt.show()
 
 # function to plot the graph which shows the initial number of UMIs for all genes in each cell
-def individualInitialPlotGraph():
+def individualInitialAppend():
     # this mgc variable is actually toc modified, we use mgc variable name in order to maintain consistency with the finalPlotGraph function
     mgc = toc[['swH3N2_PB2_comm_raw', 'swH1N1_PB2_comm_raw', 'swH3N2_PB1_comm2_raw', 'swH1N1_PB1_comm2_raw',
                 'swH3N2_PA_comm_raw', 'swH1N1_PA_comm_raw', 'swH3N2_HAa_raw', 'swH1N1_HAa_raw', 
@@ -259,186 +400,169 @@ def individualInitialPlotGraph():
                 'swH3N2_M_comm_raw', 'swH1N1_M_comm_raw', 'swH3N2_NS_comm_raw', 'swH1N1_NS_comm_raw']]
 
     # x is H1N1, y is H3N2
-    # initialising lists for plotting individual genes
-    xPB2 = []
-    yPB2 = []
-    xPB1 = []
-    yPB1 = []
-    xPA = []
-    yPA = []
-    xHAa = []
-    yHAa = []
-    xNP = []
-    yNP = []
-    yNAa = []
-    xNAb = []
-    xM = []
-    yM = []
-    xNS = []
-    yNS = []
-
+    global xPB2i, yPB2i, xPB1i, yPB1i, xPAi, yPAi, xHAai, yHAai, xNPi, yNPi, xNAai, yNAai, xMi, yMi
     # loop to add values to the lists
     for i in range (len(mgc)):
-        yPB2.append(mgc.iloc[i][0])
-        xPB2.append(mgc.iloc[i][1])
-        yPB1.append(mgc.iloc[i][2])
-        xPB1.append(mgc.iloc[i][3])
-        yPA.append(mgc.iloc[i][4])
-        xPA.append(mgc.iloc[i][5])
-        yHAa.append(mgc.iloc[i][6])
-        xHAa.append(mgc.iloc[i][7])
-        yNP.append(mgc.iloc[i][8])
-        xNP.append(mgc.iloc[i][9])
-        yNAa.append(mgc.iloc[i][10])
-        xNAb.append(mgc.iloc[i][11])
-        yM.append(mgc.iloc[i][12])
-        xM.append(mgc.iloc[i][13])
-        yNS.append(mgc.iloc[i][14])
-        xNS.append(mgc.iloc[i][15])
-
-    # plotting the subplots in one graph
-    plt.subplot(4,2,1)
-    plt.plot(xPB2, yPB2, 'o', color = 'blue')
-    plt.title('PB2')
-    plt.xlabel('H1N1')
-    plt.ylabel('H3N2')
-
-    plt.subplot(4,2,2)
-    plt.plot(xPB1, yPB1, 'o', color = 'blue')
-    plt.title('PB1')
-    plt.xlabel('H1N1')
-    plt.ylabel('H3N2')
-
-    plt.subplot(4,2,3)
-    plt.plot(xPA, yPA, 'o', color = 'blue')
-    plt.title('PA')
-    plt.xlabel('H1N1')
-    plt.ylabel('H3N2')
-
-    plt.subplot(4,2,4)
-    plt.plot(xHAa, yHAa, 'o', color = 'blue')
-    plt.title('HAa')
-    plt.xlabel('H1N1')
-    plt.ylabel('H3N2')
-
-    plt.subplot(4,2,5)
-    plt.plot(xNP, yNP, 'o', color = 'blue')
-    plt.title('NP')
-    plt.xlabel('H1N1')
-    plt.ylabel('H3N2')
-
-    plt.subplot(4,2,6)
-    plt.plot(xNAb, yNAa, 'o', color = 'blue')
-    plt.title('NAa/b')
-    plt.xlabel('H1N1')
-    plt.ylabel('H3N2')
-
-    plt.subplot(4,2,7)
-    plt.plot(xM, yM, 'o', color = 'blue')
-    plt.title('M')
-    plt.xlabel('H1N1')
-    plt.ylabel('H3N2')
-
-    plt.subplot(4,2,8)
-    plt.plot(xNS, yNS, 'o', color = 'blue')
-    plt.title('NS')
-    plt.xlabel('H1N1')
-    plt.ylabel('H3N2')
-
-    # showing the plot
-    plt.show()
+        yPB2i.append(mgc.iloc[i][0])
+        xPB2i.append(mgc.iloc[i][1])
+        yPB1i.append(mgc.iloc[i][2])
+        xPB1i.append(mgc.iloc[i][3])
+        yPAi.append(mgc.iloc[i][4])
+        xPAi.append(mgc.iloc[i][5])
+        yHAai.append(mgc.iloc[i][6])
+        xHAai.append(mgc.iloc[i][7])
+        yNPi.append(mgc.iloc[i][8])
+        xNPi.append(mgc.iloc[i][9])
+        yNAai.append(mgc.iloc[i][10])
+        xNAbi.append(mgc.iloc[i][11])
+        yMi.append(mgc.iloc[i][12])
+        xMi.append(mgc.iloc[i][13])
+        yNSi.append(mgc.iloc[i][14])
+        xNSi.append(mgc.iloc[i][15])
 
 # function to plot the graph which shows the final number of UMIs for all genes in each cell
-def individualFinalPlotGraph():
+def individualFinalAppend():
     mgc = write_mgc()
     # x is H1N1, y is H3N2
-    # initialising lists for plotting individual genes
-    xPB2 = []
-    yPB2 = []
-    xPB1 = []
-    yPB1 = []
-    xPA = []
-    yPA = []
-    xHAa = []
-    yHAa = []
-    xNP = []
-    yNP = []
-    yNAa = []
-    xNAb = []
-    xM = []
-    yM = []
-    xNS = []
-    yNS = []
-
     # loop to add values to the lists
+    global xPB2f, yPB2f, xPB1f, yPB1f, xPAf, yPAf, xHAaf, yHAaf, xNPf, yNPf, xNAaf, yNAaf, xMf, yMf, xNSf, yNSf
     for i in range(len(mgc)):
-        yPB2.append(mgc[i][0])
-        xPB2.append(mgc[i][1])
-        yPB1.append(mgc[i][2])
-        xPB1.append(mgc[i][3])
-        yPA.append(mgc[i][4])
-        xPA.append(mgc[i][5])
-        yHAa.append(mgc[i][6])
-        xHAa.append(mgc[i][7])
-        yNP.append(mgc[i][8])
-        xNP.append(mgc[i][9])
-        yNAa.append(mgc[i][10])
-        xNAb.append(mgc[i][11])
-        yM.append(mgc[i][12])
-        xM.append(mgc[i][13])
-        yNS.append(mgc[i][14])
-        xNS.append(mgc[i][15])
+        yPB2f.append(mgc[i][0])
+        xPB2f.append(mgc[i][1])
+        yPB1f.append(mgc[i][2])
+        xPB1f.append(mgc[i][3])
+        yPAf.append(mgc[i][4])
+        xPAf.append(mgc[i][5])
+        yHAaf.append(mgc[i][6])
+        xHAaf.append(mgc[i][7])
+        yNPf.append(mgc[i][8])
+        xNPf.append(mgc[i][9])
+        yNAaf.append(mgc[i][10])
+        xNAbf.append(mgc[i][11])
+        yMf.append(mgc[i][12])
+        xMf.append(mgc[i][13])
+        yNSf.append(mgc[i][14])
+        xNSf.append(mgc[i][15])
 
+def plotPB2():
     # plotting the subplots in one graph
-    plt.subplot(4,2,1)
-    plt.plot(xPB2, yPB2, 'o', color = 'blue')
-    plt.title('PB2')
+    plt.subplot(1,2,1)
+    plt.plot(xPB2i, yPB2i, '.', color = 'blue')
+    plt.title('Before')
     plt.xlabel('H1N1')
     plt.ylabel('H3N2')
 
-    plt.subplot(4,2,2)
-    plt.plot(xPB1, yPB1, 'o', color = 'blue')
-    plt.title('PB1')
+    plt.subplot(1,2,2)
+    plt.plot(xPB2f, yPB2f, '.', color = 'red')
+    plt.title('After')
     plt.xlabel('H1N1')
     plt.ylabel('H3N2')
 
-    plt.subplot(4,2,3)
-    plt.plot(xPA, yPA, 'o', color = 'blue')
-    plt.title('PA')
+    plt.show()
+
+def plotPB1():
+    plt.subplot(1,2,1)
+    plt.plot(xPB1i, yPB1i, '.', color = 'blue')
+    plt.title('Before')
     plt.xlabel('H1N1')
     plt.ylabel('H3N2')
 
-    plt.subplot(4,2,4)
-    plt.plot(xHAa, yHAa, 'o', color = 'blue')
-    plt.title('HAa')
+    plt.subplot(1,2,2)
+    plt.plot(xPB1f, yPB1f, '.', color = 'red')
+    plt.title('After')
     plt.xlabel('H1N1')
     plt.ylabel('H3N2')
 
-    plt.subplot(4,2,5)
-    plt.plot(xNP, yNP, 'o', color = 'blue')
-    plt.title('NP')
+    plt.show()
+
+def plotPA():
+    plt.subplot(1,2,1)
+    plt.plot(xPAi, yPAi, '.', color = 'blue')
+    plt.title('Before')
     plt.xlabel('H1N1')
     plt.ylabel('H3N2')
 
-    plt.subplot(4,2,6)
-    plt.plot(xNAb, yNAa, 'o', color = 'blue')
-    plt.title('NAa/b')
+    plt.subplot(1,2,2)
+    plt.plot(xPAf, yPAf, '.', color = 'red')
+    plt.title('After')
     plt.xlabel('H1N1')
     plt.ylabel('H3N2')
 
-    plt.subplot(4,2,7)
-    plt.plot(xM, yM, 'o', color = 'blue')
-    plt.title('M')
+    plt.show()
+
+def plotHAa():
+    plt.subplot(1,2,1)
+    plt.plot(xHAai, yHAai, '.', color = 'blue')
+    plt.title('Before')
     plt.xlabel('H1N1')
     plt.ylabel('H3N2')
 
-    plt.subplot(4,2,8)
-    plt.plot(xNS, yNS, 'o', color = 'blue')
-    plt.title('NS')
+    plt.subplot(1,2,2)
+    plt.plot(xHAaf, yHAaf, '.', color = 'red')
+    plt.title('After')
     plt.xlabel('H1N1')
     plt.ylabel('H3N2')
 
-    # showing the plot
+    plt.show()
+
+def plotNP():
+    plt.subplot(1,2,1)
+    plt.plot(xNPi, yNPi, '.', color = 'blue')
+    plt.title('Before')
+    plt.xlabel('H1N1')
+    plt.ylabel('H3N2')
+
+    plt.subplot(1,2,2)
+    plt.plot(xNPf, yNPf, '.', color = 'red')
+    plt.title('After')
+    plt.xlabel('H1N1')
+    plt.ylabel('H3N2')
+
+    plt.show()
+
+def plotNAab():
+    plt.subplot(1,2,1)
+    plt.plot(xNAbi, yNAai, '.', color = 'blue')
+    plt.title('Before')
+    plt.xlabel('H1N1')
+    plt.ylabel('H3N2')
+
+    plt.subplot(1,2,2)
+    plt.plot(xNAbf, yNAaf, '.', color = 'red')
+    plt.title('After')
+    plt.xlabel('H1N1')
+    plt.ylabel('H3N2')
+
+    plt.show()
+
+def plotM():
+    plt.subplot(1,2,1)
+    plt.plot(xMi, yMi, '.', color = 'blue')
+    plt.title('Before')
+    plt.xlabel('H1N1')
+    plt.ylabel('H3N2')
+
+    plt.subplot(1,2,2)
+    plt.plot(xMf, yMf, '.', color = 'red')
+    plt.title('After')
+    plt.xlabel('H1N1')
+    plt.ylabel('H3N2')
+
+    plt.show()
+
+def plotNS():
+    plt.subplot(1,2,1)
+    plt.plot(xNSi, yNSi, '.', color = 'blue')
+    plt.title('Before')
+    plt.xlabel('H1N1')
+    plt.ylabel('H3N2')
+
+    plt.subplot(1,2,2)
+    plt.plot(xNSf, yNSf, '.', color = 'red')
+    plt.title('After')
+    plt.xlabel('H1N1')
+    plt.ylabel('H3N2')
+
     plt.show()
 
 # function to traverse mgc to calculate final error
@@ -490,14 +614,51 @@ def plotHistogram():
     # showing the plot
     plt.show()
 
-# uncomment the functions "write_mgc()" to run the code and output to output.csv
-# write_mgc()
+def plotPieChart():
+    labels = ['H1N1', 'H3N2', 'Partial H1N1', 'Partial H3N2', 'Reassortment', 'Empty', 'Doublet']
+    colors = ['blue', 'green', 'red', 'yellow', 'pink', 'brown', 'orange']
+    global h1n1_count_initial, h3n2_count_initial, partialh1n1_count_initial, partialh3n2_count_initial, reassortment_count_initial, empty_count, doublet_count_initial
+    # print(h1n1_count_initial)
+    # print(h3n2_count_initial)
+    # print(partialh1n1_count_initial)
+    # print(partialh3n2_count_initial)
+    # print(reassortment_count_initial)
+    # print(empty_count)
+    # print(doublet_count_initial)
+    values = [h1n1_count_initial, h3n2_count_initial, partialh1n1_count_initial, partialh3n2_count_initial, reassortment_count_initial, empty_count, doublet_count_initial]
+    plt.pie(values, labels=labels, colors=colors, startangle=90, autopct='%1.1f%%')
+    plt.axis('equal')
+    plt.show()
 
-# uncomment the function below whichever plot you need to see
-# SumPlotGraph()
-# individualInitialPlotGraph()
-# individualFinalPlotGraph()
+def plotPieFinal():
+    labels = ['H1N1', 'H3N2', 'Partial H1N1', 'Partial H3N2', 'Reassortment', 'Empty', 'Doublet']
+    colors = ['blue', 'green', 'red', 'yellow', 'pink', 'brown', 'orange']
+    global h1n1_count_final, h3n2_count_final, partialh1n1_count_final, partialh3n2_count_final, reassortment_count_final, empty_count, doublet_count_final
+
+    values = [h1n1_count_final, h3n2_count_final, partialh1n1_count_final, partialh3n2_count_final, reassortment_count_final, empty_count, doublet_count_final]
+    plt.pie(values, labels=labels, colors=colors, startangle=90, autopct='%1.1f%%')
+    plt.axis('equal')
+    plt.show()
+
+# uncomment the functions "write_mgc()" to run the code and output to output.csv and classification_tod() to get global values for percentage plot
+# write_mgc()
+# classification_tod()
 
 # uncomment both the functions to get the histogram plot
 # traverse_mgc()
 # plotHistogram()
+
+# uncomment the function below whichever plot you need to see
+# SumPlotGraph()
+# individualInitialAppend()
+# individualFinalAppend()
+# plotPB2()
+# plotPB1()
+# plotPA()
+# plotHAa()
+# plotNP()
+# plotNAab()
+# plotM()
+# plotNS()
+# plotPieChart()
+# plotPieFinal()
