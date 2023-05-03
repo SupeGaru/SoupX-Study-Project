@@ -626,7 +626,8 @@ def plotPieChart():
     # print(empty_count)
     # print(doublet_count_initial)
     values = [h1n1_count_initial, h3n2_count_initial, partialh1n1_count_initial, partialh3n2_count_initial, reassortment_count_initial, empty_count, doublet_count_initial]
-    plt.pie(values, labels=labels, colors=colors, startangle=90, autopct='%1.1f%%')
+    explode = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+    plt.pie(values, labels=labels, colors=colors, explode = explode, startangle=90, autopct='%1.1f%%',labeldistance=1.3, pctdistance=1.1)
     plt.axis('equal')
     plt.show()
 
@@ -636,13 +637,14 @@ def plotPieFinal():
     global h1n1_count_final, h3n2_count_final, partialh1n1_count_final, partialh3n2_count_final, reassortment_count_final, empty_count, doublet_count_final
 
     values = [h1n1_count_final, h3n2_count_final, partialh1n1_count_final, partialh3n2_count_final, reassortment_count_final, empty_count, doublet_count_final]
-    plt.pie(values, labels=labels, colors=colors, startangle=90, autopct='%1.1f%%')
+    explode = [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+    plt.pie(values, labels=labels, colors=colors, explode = explode, startangle=90, autopct='%1.1f%%',labeldistance=1.3, pctdistance=1.1)
     plt.axis('equal')
     plt.show()
 
 # uncomment the functions "write_mgc()" to run the code and output to output.csv and classification_tod() to get global values for percentage plot
-# write_mgc()
-# classification_tod()
+write_mgc()
+classification_tod()
 
 # uncomment both the functions to get the histogram plot
 # traverse_mgc()
